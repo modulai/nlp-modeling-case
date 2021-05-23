@@ -14,7 +14,7 @@ train_df = pd.read_csv('C:\\Doc\\twitter_dataset_full.csv')
 print(train_df.count())
 train_df = train_df.dropna()
 train_df = train_df.drop_duplicates()
-#train_df = train_df.tail(1000)
+#train_df = train_df.head(1000)
 
 def preprocess_tweet(row):
     text = row['message']
@@ -45,7 +45,7 @@ train_df['message'] = tweetText.apply(word_tokenize)
 train_df1 = pd.concat([train_df['message'], train_df['is_positive']], axis=1)
 train_df1.head()
 
-
+train_df['is_positive'] = pd.to_numeric(train_df['is_positive'])
 #####Training##############
 
 from sklearn.model_selection import train_test_split        
@@ -60,29 +60,28 @@ class TweetNBClassifier(object):
 
     def __init__(self, df_train):
         self.df_train = df_train
-        self.df_pos = df_train.copy()[df_train['is_positive'] == '1']
-        self.df_neg = df_train.copy()[df_train['is_positive'] == '0']
+        self.df_pos = df_train.copy()[df_train['is_positive'] == 1]
+        self.df_neg = df_train.copy()[df_train['is_positive'] == 0]
        
 
     def fit(self):
-        #self.df_train = df_train
-        #self.df_pos = df_train.copy()[df_train['is_positive'] == '1']
-        #self.df_neg = df_train.copy()[df_train['is_positive'] == '0']
+        
         Pr_pos = self.df_pos.shape[0]/self.df_train.shape[0]
         Pr_neg =self.df_neg.shape[0]/self.df_train.shape[0]
         
         self.Prior  = (Pr_pos, Pr_neg)
 
-        self.pos_words = ' '.join(self.df_pos['message'].tolist()).split()
-        self.neg_words = ' '.join(self.df_neg['message'].tolist()).split()
+        self.pos_words = ','.join(map(str, self.df_pos['message']))
+        self.neg_words = ','.join(map(str, self.df_neg['message']))
+        
+        
         
         all_words = ','.join(map(str, self.df_train['message']))
-        #all_words = ','.join(self.df_train['message'].tolist()).split()
-        #all_words =self.df_train['message'].tolist()
+        
         self.vocab = len(Counter(all_words))
 
-        wc_pos = len(' '.join(self.df_pos['message'].tolist()).split())
-        wc_neg = len(' '.join(self.df_neg['message'].tolist()).split())
+        wc_pos = len(','.join(map(str, self.df_pos['message'])))
+        wc_neg = len(','.join(map(str, self.df_neg['message'])))
        
         self.word_count = (wc_pos, wc_neg)
         return self
@@ -145,16 +144,21 @@ df_test['message'] = X_test
 df_test['is_positive'] = y_test
 df_test = df_test.reset_index(drop=True)    
 
-
+#########train and predict
 tnb = TweetNBClassifier(df_train)
 tnb = tnb.fit()
 predict = tnb.predict(df_test)
-#score = tnb.score(predict,'Their codes are amazing.')
+print(predict)
+
+#F1-Score and Accuracy#########
+
+from sklearn.metrics import f1_score
+
+df_test['is_positive'] = pd.to_numeric(df_test['is_positive'])
+predict = pd.to_numeric(predict)
+
+print("F1-Score",f1_score(df_test['is_positive'], predict, average='weighted'))
+
 score = tnb.score(predict,df_test.is_positive.tolist())
-print(score)
+print("Accuracy",score)
 
-#from textblob.classifiers import NaiveBayesClassifier as NBC
-#from textblob import TextBlob
-
-#model = NBC(train_df1) 
-#print(model.classify("Their codes are amazing."))
