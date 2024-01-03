@@ -6,7 +6,7 @@
 
 The task is to use a version of the Twitter sentiment dataset (you can download the dataset using this [link](https://drive.google.com/file/d/13mAaFqCrscUYkoITf4rZ6qG9ptAlIJVb/view?usp=sharing)) and create a comprehensive preprocessing, training, and validation pipeline to predict the target variable `is_positive`. Additionally, you are required to compare your results with those obtained using Zero-shot prediction with a pre-trained [BART model](https://huggingface.co/transformers/model_doc/bart.html).
 
-The repository contains a small version of the dataset (20K examples) with an additional column `bart_is_positive`, which contains the Zero-shot prediction of the BART model using the query `This example is positive`. An example of how this is done is included in the notebook [bart_example.ipynb](./bart_example.ipynb). If you do not have access to a GPU (as BART inference can be slow using CPU), you are free to base your training and analysis on this smaller version of the dataset.
+The repository contains a small version of the dataset ([data/twitter_dataset_small_w_bart_preds.csv](data/twitter_dataset_small_w_bart_preds.csv) containing 20K examples) with an additional column `bart_is_positive`, which contains the Zero-shot prediction of the BART model using the query `This example is positive`. An example of how this is done is included in the notebook [bart_example.ipynb](./bart_example.ipynb). If you do not have access to a GPU (as BART inference can be slow using CPU), you are free to base your training and analysis on this smaller version of the dataset.
 
 ### Summary
 
